@@ -9,9 +9,16 @@
 </head>
 
 <body>
-  <main>
-    <h1>Vanilla JavaScript App</h1>
-  </main>
+    <main>
+        <h1>Vanilla JavaScript App</h1>
+    </main>
+
+    <a href="/.auth/login/aad">Sign in</a>
+    <a href="/.auth/logout">Sign out</a>
+
+    <script>fetch("/.auth/me")
+    .then(r => r.json())
+    .then(data => console.log("me", data));</script>
 </body>
 
 </html>
