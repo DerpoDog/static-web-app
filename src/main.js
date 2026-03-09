@@ -13,6 +13,7 @@ async function callApi() {
 window.addEventListener("DOMContentLoaded", async () => {
     try {
         await window.auth.initAuth();
+        updateUI();
         const account = window.auth.getAccount();
         document.getElementById("output").textContent =
             account ? `Logged in as ${account.username || account.name}` : "Not signed in";
