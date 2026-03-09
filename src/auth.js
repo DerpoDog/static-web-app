@@ -44,7 +44,7 @@ async function initAuth() {
 }
 
 function getAccount() {
-    return msalInstance.getActiveAccount();
+    return msalInstance.getActiveAccount() || msalInstance.getAllAccounts()[0] || null;
 }
 
 function login() {
