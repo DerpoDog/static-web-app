@@ -2,7 +2,7 @@ const tenantId = "8c9cab84-3a29-4a80-ac5f-b144726d1431";
 const clientId = "8ca78a18-64c4-428b-9d38-dec2694411fd";
 const apiClientId = "b55a8091-76a9-47c7-8c03-7f198d75680d";
 const authorityHost = "testcustomers11.ciamlogin.com";
-const signUpSignInPolicy = "Signupsignin";
+const signUpSignInPolicy = "SignupSignin";
 
 const msalConfig = {
     auth: {
