@@ -6,8 +6,7 @@ const apiClientId = "b55a8091-76a9-47c7-8c03-7f198d75680d";
 const policy = "SignupSignin";
 
 // IMPORTANT: use the SAME domain you see when clicking "Run user flow"
-const authorityBase = "https://<YOUR_DOMAIN_FROM_RUN_USER_FLOW>";
-// Example: https://testcustomers11.ciamlogin.com  (or login.microsoftonline.com)
+const authorityBase = "https://testcustomers11.ciamlogin.com";
 
 const msalConfig = {
     auth: {
