@@ -3,14 +3,15 @@ const clientId = "8ca78a18-64c4-428b-9d38-dec2694411fd";
 const apiClientId = "b55a8091-76a9-47c7-8c03-7f198d75680d";
 const policy = "SignupSignin";
 
-// IMPORTANT: use the SAME domain you see when clicking "Run user flow"
+// Use the same domain shown by your External ID / user flow setup
 const authorityBase = "https://testcustomers11.ciamlogin.com";
 
 const msalConfig = {
     auth: {
         clientId,
         authority: `${authorityBase}/${tenantId}/${policy}`,
-        redirectUri: window.location.origin
+        redirectUri: window.location.origin,
+        postLogoutRedirectUri: window.location.origin
     },
     cache: {
         cacheLocation: "localStorage"
@@ -19,37 +20,80 @@ const msalConfig = {
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-const tokenRequest = {
+const loginRequest = {
+    scopes: ["openid", "profile", "offline_access"]
+};
+
+const apiTokenRequest = {
     scopes: [`api://${apiClientId}/questions.read`]
 };
 
-async function login() {
-    await msalInstance.initialize();
-    return msalInstance.loginPopup(tokenRequest);
-}
-
-async function getAccessToken() {
+async function initAuth() {
     await msalInstance.initialize();
 
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length === 0) {
-        await login();
+    const response = await msalInstance.handleRedirectPromise();
+    if (response?.account) {
+        msalInstance.setActiveAccount(response.account);
     }
 
-    const account = msalInstance.getAllAccounts()[0];
+    const active = msalInstance.getActiveAccount();
+    if (!active) {
+        const accounts = msalInstance.getAllAccounts();
+        if (accounts.length > 0) {
+            msalInstance.setActiveAccount(accounts[0]);
+        }
+    }
+}
+
+function getAccount() {
+    return msalInstance.getActiveAccount();
+}
+
+async function login() {
+    const result = await msalInstance.loginPopup(loginRequest);
+    msalInstance.setActiveAccount(result.account);
+    return result;
+}
+
+// Use this instead if you want full-page redirect instead of popup:
+// async function login() {
+//   return msalInstance.loginRedirect(loginRequest);
+// }
+
+async function getAccessToken() {
+    let account = getAccount();
+
+    if (!account) {
+        const loginResult = await login();
+        account = loginResult.account;
+    }
 
     try {
         const result = await msalInstance.acquireTokenSilent({
-            ...tokenRequest,
+            ...apiTokenRequest,
             account
         });
         return result.accessToken;
     } catch (e) {
-        // fallback if silent fails
-        const result = await msalInstance.acquireTokenPopup(tokenRequest);
+        const result = await msalInstance.acquireTokenPopup({
+            ...apiTokenRequest,
+            account
+        });
         return result.accessToken;
     }
 }
 
-// expose to main.js
-window.auth = { login, getAccessToken };
+async function logout() {
+    const account = getAccount();
+    if (account) {
+        await msalInstance.logoutPopup({ account });
+    }
+}
+
+window.auth = {
+    initAuth,
+    login,
+    logout,
+    getAccessToken,
+    getAccount
+};
