@@ -24,27 +24,36 @@ const tokenRequest = {
 async function initAuth() {
     await msalInstance.initialize();
 
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.has("code")) {
+        sessionStorage.setItem("signedIn", "true");
+        history.replaceState({}, "", window.location.pathname);
+    }
+
     try {
         const response = await msalInstance.handleRedirectPromise();
-
-        if (response) {
-            console.log("Login response:", response);
+        if (response?.account) {
             msalInstance.setActiveAccount(response.account);
+            sessionStorage.setItem("signedIn", "true");
         }
-
     } catch (e) {
         console.error("Redirect handling failed:", e);
     }
 
     const accounts = msalInstance.getAllAccounts();
-
     if (accounts.length > 0) {
         msalInstance.setActiveAccount(accounts[0]);
+        sessionStorage.setItem("signedIn", "true");
     }
 }
 
 function getAccount() {
     return msalInstance.getActiveAccount() || msalInstance.getAllAccounts()[0] || null;
+}
+
+function isSignedIn() {
+    return sessionStorage.getItem("signedIn") === "true";
 }
 
 function login() {
@@ -63,6 +72,7 @@ function login() {
 }
 
 async function logout() {
+    sessionStorage.removeItem("signedIn");
     localStorage.clear();
 
     const logoutUrl =
@@ -100,5 +110,6 @@ window.auth = {
     login,
     logout,
     getAccessToken,
-    getAccount
+    getAccount,
+    isSignedIn
 };

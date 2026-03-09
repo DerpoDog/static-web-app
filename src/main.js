@@ -14,8 +14,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     try {
         await window.auth.initAuth();
         updateUI();
-
-        const account = window.auth.getAccount();
     } catch (e) {
         document.getElementById("output").textContent = "Startup failed: " + e;
     }
@@ -47,9 +45,17 @@ document.getElementById("callApiBtn").addEventListener("click", async () => {
 
 function updateUI() {
     const account = window.auth.getAccount();
+    const signedIn = window.auth.isSignedIn();
 
-    document.getElementById("loginBtn").style.display = account ? "none" : "inline-block";
-    document.getElementById("logoutBtn").style.display = account ? "inline-block" : "none";
-    document.getElementById("output").textContent =
-        account ? `Logged in as ${account.username || account.name || "user"}` : "Not signed in";
+    document.getElementById("loginBtn").style.display = signedIn ? "none" : "inline-block";
+    document.getElementById("logoutBtn").style.display = signedIn ? "inline-block" : "none";
+
+    if (account) {
+        document.getElementById("output").textContent =
+            `Logged in as ${account.username || account.name || "user"}`;
+    } else if (signedIn) {
+        document.getElementById("output").textContent = "Logged in ✅";
+    } else {
+        document.getElementById("output").textContent = "Not signed in";
+    }
 }
