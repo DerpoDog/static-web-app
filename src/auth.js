@@ -1,13 +1,13 @@
 const tenantId = "8c9cab84-3a29-4a80-ac5f-b144726d1431";
-const clientId = "8ca78a18-64c4-428b-9d38-dec2694411fd";
+const clientId = "f6bb895b-5d53-4ea3-bbce-fa1f318764c8";
 const apiClientId = "b55a8091-76a9-47c7-8c03-7f198d75680d";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
 const msalConfig = {
     auth: {
-        clientId: "8ca78a18-64c4-428b-9d38-dec2694411fd",
-        authority: "https://testcustomers11.ciamlogin.com/8c9cab84-3a29-4a80-ac5f-b144726d1431/Signupsignin",
-        knownAuthorities: ["testcustomers11.ciamlogin.com"],
+        clientId,
+        authority: `https://${authorityHost}/${tenantId}/SignupSignin`,
+        knownAuthorities: [authorityHost],
         redirectUri: window.location.origin
     },
     cache: {
@@ -16,10 +16,6 @@ const msalConfig = {
 };
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
-
-const loginRequest = {
-    scopes: ["openid", "profile", "offline_access"]
-};
 
 const tokenRequest = {
     scopes: [`api://${apiClientId}/questions.read`]
@@ -45,27 +41,35 @@ function getAccount() {
 
 function login() {
     const url =
-        "https://testcustomers11.ciamlogin.com/8c9cab84-3a29-4a80-ac5f-b144726d1431/oauth2/v2.0/authorize?client_id=f6bb895b-5d53-4ea3-bbce-fa1f318764c8&nonce=j9wIZ8iyjn&redirect_uri=https://white-grass-051116610.1.azurestaticapps.net/&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=9uEcpjMgkHKUCMrR7rBlJA0wdAg3CL_MnHlCuwkl0cM";
+        `https://${authorityHost}/${tenantId}/oauth2/v2.0/authorize` +
+        `?client_id=${clientId}` +
+        `&nonce=j9wIZ8iyjn` +
+        `&redirect_uri=${encodeURIComponent(window.location.origin + "/")}` +
+        `&scope=openid` +
+        `&response_type=code` +
+        `&prompt=login` +
+        `&code_challenge_method=S256` +
+        `&code_challenge=9uEcpjMgkHKUCMrR7rBlJA0wdAg3CL_MnHlCuwkl0cM`;
+
     window.location.href = url;
 }
 
 async function logout() {
-    const account = getAccount();
+    localStorage.clear();
 
-    if (!account) return;
+    const logoutUrl =
+        `https://${authorityHost}/${tenantId}/oauth2/v2.0/logout` +
+        `?post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
 
-    await msalInstance.logoutPopup({
-        account,
-        mainWindowRedirectUri: window.location.origin
-    });
+    window.location.href = logoutUrl;
 }
 
 async function getAccessToken() {
-    let account = getAccount();
+    const account = getAccount();
 
     if (!account) {
-        const loginResult = await login();
-        account = loginResult.account;
+        await login();
+        throw new Error("Redirecting to login...");
     }
 
     try {
