@@ -86,6 +86,7 @@ async function getAccessToken() {
 window.auth = {
     initAuth,
     login,
+    logout,
     getAccessToken,
     getAccount
 };
