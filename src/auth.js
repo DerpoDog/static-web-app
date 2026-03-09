@@ -24,13 +24,21 @@ const tokenRequest = {
 async function initAuth() {
     await msalInstance.initialize();
 
-    const response = await msalInstance.handleRedirectPromise();
-    if (response?.account) {
-        msalInstance.setActiveAccount(response.account);
+    try {
+        const response = await msalInstance.handleRedirectPromise();
+
+        if (response) {
+            console.log("Login response:", response);
+            msalInstance.setActiveAccount(response.account);
+        }
+
+    } catch (e) {
+        console.error("Redirect handling failed:", e);
     }
 
     const accounts = msalInstance.getAllAccounts();
-    if (!msalInstance.getActiveAccount() && accounts.length > 0) {
+
+    if (accounts.length > 0) {
         msalInstance.setActiveAccount(accounts[0]);
     }
 }
