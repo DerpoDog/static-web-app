@@ -14,6 +14,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     try {
         await window.auth.initAuth();
         updateUI();
+
         const account = window.auth.getAccount();
         document.getElementById("output").textContent =
             account ? `Logged in as ${account.username || account.name}` : "Not signed in";
@@ -25,8 +26,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 document.getElementById("loginBtn").addEventListener("click", async () => {
     try {
         await window.auth.login();
-        updateUI();
-        document.getElementById("output").textContent = "Logged in ✅";
     } catch (e) {
         document.getElementById("output").textContent = "Login failed: " + e;
     }
@@ -35,8 +34,6 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     try {
         await window.auth.logout();
-        updateUI();
-        document.getElementById("output").textContent = "Logged out 👋";
     } catch (e) {
         document.getElementById("output").textContent = "Logout failed: " + e;
     }
