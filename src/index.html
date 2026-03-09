@@ -9,16 +9,20 @@
 </head>
 
 <body>
-    <main>
-        <h1>Vanilla JavaScript App</h1>
-    </main>
+        <button id="loginBtn">Login / Sign up</button>
+        <button id="callApiBtn">Call API</button>
 
-    <a href="/.auth/login/aad">Sign in</a>
-    <a href="/.auth/logout">Sign out</a>
+        <pre id="output"></pre>
 
-    <script>fetch("/.auth/me")
-    .then(r => r.json())
-    .then(data => console.log("me", data));</script>
+        <script src="https://alcdn.msauth.net/browser/2.39.0/js/msal-browser.min.js"></script>
+        <script src="/auth.js"></script>
+        <script src="/main.js"></script>
+
+<script src="https://alcdn.msauth.net/browser/2.39.0/js/msal-browser.min.js"></script>
+<script>
+    fetch("/.auth/me")
+        .then(r => r.json())
+        .then(data => console.log("me", data));</script>
 </body>
 
 </html>
