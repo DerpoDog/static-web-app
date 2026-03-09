@@ -24,9 +24,20 @@ window.addEventListener("DOMContentLoaded", async () => {
 document.getElementById("loginBtn").addEventListener("click", async () => {
     try {
         await window.auth.login();
+        updateUI();
         document.getElementById("output").textContent = "Logged in ✅";
     } catch (e) {
         document.getElementById("output").textContent = "Login failed: " + e;
+    }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+        await window.auth.logout();
+        updateUI();
+        document.getElementById("output").textContent = "Logged out 👋";
+    } catch (e) {
+        document.getElementById("output").textContent = "Logout failed: " + e;
     }
 });
 
@@ -37,3 +48,10 @@ document.getElementById("callApiBtn").addEventListener("click", async () => {
         document.getElementById("output").textContent = "API call failed: " + e;
     }
 });
+
+function updateUI() {
+    const account = window.auth.getAccount();
+
+    document.getElementById("loginBtn").style.display = account ? "none" : "inline-block";
+    document.getElementById("logoutBtn").style.display = account ? "inline-block" : "none";
+}
