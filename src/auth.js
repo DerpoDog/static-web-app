@@ -1,16 +1,14 @@
 const tenantId = "8c9cab84-3a29-4a80-ac5f-b144726d1431";
 const clientId = "8ca78a18-64c4-428b-9d38-dec2694411fd";
 const apiClientId = "b55a8091-76a9-47c7-8c03-7f198d75680d";
-const policy = "Signupsignin";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
 const msalConfig = {
     auth: {
-        clientId,
-        authority: `https://${authorityHost}/${tenantId}/${policy}/v2.0`,
-        knownAuthorities: [authorityHost],
-        redirectUri: window.location.origin,
-        postLogoutRedirectUri: window.location.origin
+        clientId: "8ca78a18-64c4-428b-9d38-dec2694411fd",
+        authority: "https://testcustomers11.ciamlogin.com/8c9cab84-3a29-4a80-ac5f-b144726d1431",
+        knownAuthorities: ["testcustomers11.ciamlogin.com"],
+        redirectUri: window.location.origin
     },
     cache: {
         cacheLocation: "localStorage"
@@ -23,7 +21,7 @@ const loginRequest = {
     scopes: ["openid", "profile", "offline_access"]
 };
 
-const apiTokenRequest = {
+const tokenRequest = {
     scopes: [`api://${apiClientId}/questions.read`]
 };
 
@@ -35,12 +33,9 @@ async function initAuth() {
         msalInstance.setActiveAccount(response.account);
     }
 
-    const active = msalInstance.getActiveAccount();
-    if (!active) {
-        const accounts = msalInstance.getAllAccounts();
-        if (accounts.length > 0) {
-            msalInstance.setActiveAccount(accounts[0]);
-        }
+    const accounts = msalInstance.getAllAccounts();
+    if (!msalInstance.getActiveAccount() && accounts.length > 0) {
+        msalInstance.setActiveAccount(accounts[0]);
     }
 }
 
@@ -49,14 +44,10 @@ function getAccount() {
 }
 
 async function login() {
-    await msalInstance.initialize();
-    return msalInstance.loginPopup(loginRequest);
+    const result = await msalInstance.loginPopup(loginRequest);
+    msalInstance.setActiveAccount(result.account);
+    return result;
 }
-
-// Use this instead if you want full-page redirect instead of popup:
-// async function login() {
-//   return msalInstance.loginRedirect(loginRequest);
-// }
 
 async function getAccessToken() {
     let account = getAccount();
@@ -68,30 +59,22 @@ async function getAccessToken() {
 
     try {
         const result = await msalInstance.acquireTokenSilent({
-            ...apiTokenRequest,
+            ...tokenRequest,
             account
         });
         return result.accessToken;
     } catch (e) {
         const result = await msalInstance.acquireTokenPopup({
-            ...apiTokenRequest,
+            ...tokenRequest,
             account
         });
         return result.accessToken;
-    }
-}
-
-async function logout() {
-    const account = getAccount();
-    if (account) {
-        await msalInstance.logoutPopup({ account });
     }
 }
 
 window.auth = {
     initAuth,
     login,
-    logout,
     getAccessToken,
     getAccount
 };
