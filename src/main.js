@@ -16,8 +16,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateUI();
 
         const account = window.auth.getAccount();
-        document.getElementById("output").textContent =
-            account ? `Logged in as ${account.username || account.name}` : "Not signed in";
     } catch (e) {
         document.getElementById("output").textContent = "Startup failed: " + e;
     }
@@ -52,4 +50,6 @@ function updateUI() {
 
     document.getElementById("loginBtn").style.display = account ? "none" : "inline-block";
     document.getElementById("logoutBtn").style.display = account ? "inline-block" : "none";
+    document.getElementById("output").textContent =
+        account ? `Logged in as ${account.username || account.name || "user"}` : "Not signed in";
 }
