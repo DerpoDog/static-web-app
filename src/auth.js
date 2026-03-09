@@ -43,10 +43,10 @@ function getAccount() {
     return msalInstance.getActiveAccount();
 }
 
-async function login() {
-    const result = await msalInstance.loginPopup(loginRequest);
-    msalInstance.setActiveAccount(result.account);
-    return result;
+function login() {
+    const url =
+        "https://testcustomers11.ciamlogin.com/8c9cab84-3a29-4a80-ac5f-b144726d1431/oauth2/v2.0/authorize?client_id=f6bb895b-5d53-4ea3-bbce-fa1f318764c8&nonce=j9wIZ8iyjn&redirect_uri=https://white-grass-051116610.1.azurestaticapps.net/&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=9uEcpjMgkHKUCMrR7rBlJA0wdAg3CL_MnHlCuwkl0cM";
+    window.location.href = url;
 }
 
 async function getAccessToken() {
