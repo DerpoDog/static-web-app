@@ -3,7 +3,7 @@
 async function callApi() {
     const token = await window.auth.getAccessToken();
     const API_BASE = "https://questionapi-hpfnddgpgmabc2hx.belgiumcentral-01.azurewebsites.net";
-    const resp = await fetch("${API_BASE}/api/test", {
+    const resp = await fetch(`${API_BASE}/api/test`, {
         headers: { Authorization: `Bearer ${token}` }
     });
 
