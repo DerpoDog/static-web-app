@@ -25,8 +25,12 @@ const loginRequest = {
     scopes: ["openid", "profile", "email"]
 };
 
-const tokenRequest = {
+const apiTokenRequest = {
     scopes: [`api://${apiClientId}/questions.read`]
+};
+
+const graphTokenRequest = {
+    scopes: ["User.Read", "User.ReadWrite"]
 };
 
 async function initAuth() {
@@ -59,26 +63,87 @@ async function logout() {
     await msalInstance.logoutRedirect();
 }
 
-async function getAccessToken() {
+async function acquireToken(request) {
     const account = getAccount();
+
     if (!account) {
         await login();
-        return;
+        return null;
     }
 
     try {
         const result = await msalInstance.acquireTokenSilent({
-            ...tokenRequest,
+            ...request,
             account
         });
         return result.accessToken;
     } catch (e) {
-        const result = await msalInstance.acquireTokenRedirect({
-            ...tokenRequest,
+        await msalInstance.acquireTokenRedirect({
+            ...request,
             account
         });
-        return result?.accessToken;
+        return null;
     }
+}
+
+async function getAccessToken() {
+    return acquireToken(apiTokenRequest);
+}
+
+async function getGraphAccessToken() {
+    return acquireToken(graphTokenRequest);
+}
+
+async function getMyProfile() {
+    const token = await getGraphAccessToken();
+    if (!token) return null;
+
+    const response = await fetch("https://graph.microsoft.com/v1.0/me?$select=id,displayName,givenName,surname,country,mail,userPrincipalName", {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Graph profile read failed: ${response.status} ${text}`);
+    }
+
+    return response.json();
+}
+
+async function updateMyProfile(profile) {
+    const token = await getGraphAccessToken();
+    if (!token) return null;
+
+    const payload = {
+        displayName: profile.displayName,
+        givenName: profile.givenName,
+        surname: profile.surname,
+        country: profile.country
+    };
+
+    Object.keys(payload).forEach((key) => {
+        if (payload[key] === undefined) {
+            delete payload[key];
+        }
+    });
+
+    const response = await fetch("https://graph.microsoft.com/v1.0/me", {
+        method: "PATCH",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Graph profile update failed: ${response.status} ${text}`);
+    }
+
+    return true;
 }
 
 window.auth = {
@@ -86,6 +151,9 @@ window.auth = {
     login,
     logout,
     getAccessToken,
+    getGraphAccessToken,
+    getMyProfile,
+    updateMyProfile,
     getAccount,
     isSignedIn
 };

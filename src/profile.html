@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Edit Account</title>
+</head>
+<body>
+    <div class="page">
+        <main class="card small-card">
+            <div class="badge">Account</div>
+            <h1>Edit your account</h1>
+            <p class="subtitle">Update your Microsoft account profile details.</p>
+
+            <form id="profileForm" class="form">
+                <input id="displayName" class="input" placeholder="Display name" />
+                <input id="givenName" class="input" placeholder="First name" />
+                <input id="surname" class="input" placeholder="Last name" />
+                <input id="country" class="input" placeholder="Country" />
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" id="backBtn" class="btn btn-secondary">Back</button>
+                </div>
+            </form>
+
+            <p id="message" class="subtitle" style="margin-top: 16px;"></p>
+        </main>
+    </div>
+
+    <script src="/lib/msal-browser.min.js"></script>
+    <script src="/auth.js"></script>
+    <script>
+    async function startup() {
+      const message = document.getElementById("message");
+      const backBtn = document.getElementById("backBtn");
+      const form = document.getElementById("profileForm");
+
+      try {
+        await window.auth.initAuth();
+
+        if (!window.auth.isSignedIn()) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        const profile = await window.auth.getMyProfile();
+
+        if (profile) {
+          document.getElementById("displayName").value = profile.displayName || "";
+          document.getElementById("givenName").value = profile.givenName || "";
+          document.getElementById("surname").value = profile.surname || "";
+          document.getElementById("country").value = profile.country || "";
+        }
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          message.textContent = "Saving...";
+
+          try {
+            await window.auth.updateMyProfile({
+              displayName: document.getElementById("displayName").value.trim(),
+              givenName: document.getElementById("givenName").value.trim(),
+              surname: document.getElementById("surname").value.trim(),
+              country: document.getElementById("country").value.trim()
+            });
+
+            message.textContent = "Profile updated successfully.";
+          } catch (err) {
+            message.textContent = "Save failed: " + err.message;
+          }
+        });
+
+        backBtn.addEventListener("click", () => {
+          window.location.href = "index.html";
+        });
+      } catch (e) {
+        message.textContent = "Startup failed: " + e.message;
+      }
+    }
+
+    startup();
+    </script>
+</body>
+</html>
