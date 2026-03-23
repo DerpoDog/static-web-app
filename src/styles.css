@@ -27,6 +27,11 @@ body {
     color: var(--text);
 }
 
+.small-card {
+    max-width: 420px;
+    text-align: center;
+}
+
 body {
     min-height: 100vh;
 }
@@ -206,10 +211,5 @@ h1 {
 
     #output {
         min-height: 180px;
-    }
-
-    .small-card {
-        max-width: 420px;
-        text-align: center;
     }
 }
