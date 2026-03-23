@@ -3,12 +3,17 @@ const clientId = "f6bb895b-5d53-4ea3-bbce-fa1f318764c8";
 const apiClientId = "b55a8091-76a9-47c7-8c03-7f198d75680d";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
+const redirectUri =
+    window.location.hostname === "localhost"
+        ? "http://localhost:64172"
+        : "https://white-grass-051116610.1.azurestaticapps.net/";
+
 const msalConfig = {
     auth: {
         clientId,
         authority: `https://${authorityHost}/${tenantId}/SignupSignin`,
         knownAuthorities: [authorityHost],
-        redirectUri: window.location.origin
+        redirectUri
     },
     cache: {
         cacheLocation: "localStorage"
