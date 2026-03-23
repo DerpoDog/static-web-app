@@ -1,6 +1,6 @@
 const tenantId = "8c9cab84-3a29-4a80-ac5f-b144726d1431";
 const clientId = "bb2a932d-33f5-4ab4-bfc0-6f0fa041e83d";
-const apiClientId = "ad8b0367-13c2-49f2-8b43-a3bdd565efdf";
+const apiClientId = "718fbb7e-ef73-4f05-a642-ec2aad4150fa";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
 const redirectUri = "https://white-grass-051116610.1.azurestaticapps.net/"
