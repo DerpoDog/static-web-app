@@ -19,14 +19,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-document.getElementById("loginBtn").addEventListener("click", async () => {
-    try {
-        await window.auth.login();
-    } catch (e) {
-        document.getElementById("output").textContent = "Login failed: " + e;
-    }
-});
-
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     try {
         await window.auth.logout();
@@ -48,7 +40,6 @@ function updateUI() {
     const account = window.auth.getAccount();
     const signedIn = window.auth.isSignedIn();
 
-    document.getElementById("loginBtn").style.display = signedIn ? "none" : "inline-block";
     document.getElementById("logoutBtn").style.display = signedIn ? "inline-block" : "none";
 
     if (account) {
