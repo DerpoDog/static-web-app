@@ -4,14 +4,15 @@ const apiClientId = "718fbb7e-ef73-4f05-a642-ec2aad4150fa";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
 const redirectUri = "https://white-grass-051116610.1.azurestaticapps.net/";
-const loginPage = "https://white-grass-051116610.1.azurestaticapps.net/login.html";
+const postLogoutRedirectUri = "https://white-grass-051116610.1.azurestaticapps.net/login.html";
 
 const msalConfig = {
     auth: {
-        clientId,
-        authority: `https://${authorityHost}/${tenantId}/SignupSignin`,
+        clientId: clientId,
+        authority: `https://${authorityHost}/${tenantId}`,
         knownAuthorities: [authorityHost],
-        redirectUri
+        redirectUri: redirectUri,
+        postLogoutRedirectUri: postLogoutRedirectUri
     },
     cache: {
         cacheLocation: "localStorage"
@@ -20,6 +21,10 @@ const msalConfig = {
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
 
+const loginRequest = {
+    scopes: ["openid", "profile", "email"]
+};
+
 const tokenRequest = {
     scopes: [`api://${apiClientId}/questions.read`]
 };
@@ -27,17 +32,13 @@ const tokenRequest = {
 async function initAuth() {
     await msalInstance.initialize();
 
-    try {
-        const response = await msalInstance.handleRedirectPromise();
-        if (response?.account) {
-            msalInstance.setActiveAccount(response.account);
-        }
-    } catch (e) {
-        console.error("Redirect handling failed:", e);
+    const response = await msalInstance.handleRedirectPromise();
+    if (response?.account) {
+        msalInstance.setActiveAccount(response.account);
     }
 
     const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
+    if (!msalInstance.getActiveAccount() && accounts.length > 0) {
         msalInstance.setActiveAccount(accounts[0]);
     }
 }
@@ -51,21 +52,18 @@ function isSignedIn() {
 }
 
 async function login() {
-    await msalInstance.loginRedirect(tokenRequest);
+    await msalInstance.loginRedirect(loginRequest);
 }
 
 async function logout() {
-    await msalInstance.logoutRedirect({
-        postLogoutRedirectUri: loginPage
-    });
+    await msalInstance.logoutRedirect();
 }
 
 async function getAccessToken() {
     const account = getAccount();
-
     if (!account) {
         await login();
-        throw new Error("Redirecting to login...");
+        return;
     }
 
     try {
@@ -75,11 +73,11 @@ async function getAccessToken() {
         });
         return result.accessToken;
     } catch (e) {
-        const result = await msalInstance.acquireTokenPopup({
+        const result = await msalInstance.acquireTokenRedirect({
             ...tokenRequest,
             account
         });
-        return result.accessToken;
+        return result?.accessToken;
     }
 }
 
