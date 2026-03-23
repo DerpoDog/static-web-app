@@ -40,7 +40,7 @@ function updateUI() {
     const account = window.auth.getAccount();
     const signedIn = window.auth.isSignedIn();
 
-    document.getElementById("logoutBtn").style.display = signedIn ? "inline-block" : "none";
+    //document.getElementById("logoutBtn").style.display = signedIn ? "inline-block" : "none";
 
     if (account) {
         document.getElementById("output").textContent =
