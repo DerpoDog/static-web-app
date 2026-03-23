@@ -13,6 +13,7 @@ async function callApi() {
 async function startup() {
     const logoutBtn = document.getElementById("logoutBtn");
     const callApiBtn = document.getElementById("callApiBtn");
+    const editAccountBtn = document.getElementById("editAccountBtn");
     const output = document.getElementById("output");
 
     try {
@@ -37,10 +38,18 @@ async function startup() {
             callApiBtn.addEventListener("click", async () => {
                 try {
                     const token = await window.auth.getAccessToken();
-                    output.textContent = "Access token acquired:\n\n" + token;
+                    if (token) {
+                        output.textContent = "Access token acquired:\n\n" + token;
+                    }
                 } catch (e) {
                     output.textContent = "API call failed: " + e.message;
                 }
+            });
+        }
+
+        if (editAccountBtn) {
+            editAccountBtn.addEventListener("click", () => {
+                window.location.href = "profile.html";
             });
         }
     } catch (e) {
