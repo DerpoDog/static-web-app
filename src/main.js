@@ -29,7 +29,9 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     try {
-        await window.auth.logout();
+        await msalInstance.logoutRedirect({
+            postLogoutRedirectUri: "login.html"
+        });
     } catch (e) {
         document.getElementById("output").textContent = "Logout failed: " + e;
     }
