@@ -1,6 +1,6 @@
 const tenantId = "8c9cab84-3a29-4a80-ac5f-b144726d1431";
-const clientId = "f6bb895b-5d53-4ea3-bbce-fa1f318764c8";
-const apiClientId = "b55a8091-76a9-47c7-8c03-7f198d75680d";
+const clientId = "bb2a932d-33f5-4ab4-bfc0-6f0fa041e83d";
+const apiClientId = "ad8b0367-13c2-49f2-8b43-a3bdd565efdf";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
 const redirectUri =
