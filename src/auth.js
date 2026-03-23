@@ -3,8 +3,7 @@ const clientId = "bb2a932d-33f5-4ab4-bfc0-6f0fa041e83d";
 const apiClientId = "ad8b0367-13c2-49f2-8b43-a3bdd565efdf";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
-const redirectUri =
-    window.location.hostname === "https://white-grass-051116610.1.azurestaticapps.net/";
+const redirectUri = "https://white-grass-051116610.1.azurestaticapps.net/";
 
 const msalConfig = {
     auth: {
