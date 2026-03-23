@@ -26,13 +26,10 @@ const tokenRequest = {
 async function initAuth() {
     await msalInstance.initialize();
 
-    await msalInstance.handleRedirectPromise();
-
     try {
         const response = await msalInstance.handleRedirectPromise();
         if (response?.account) {
             msalInstance.setActiveAccount(response.account);
-            sessionStorage.setItem("signedIn", "true");
         }
     } catch (e) {
         console.error("Redirect handling failed:", e);
@@ -41,7 +38,6 @@ async function initAuth() {
     const accounts = msalInstance.getAllAccounts();
     if (accounts.length > 0) {
         msalInstance.setActiveAccount(accounts[0]);
-        sessionStorage.setItem("signedIn", "true");
     }
 }
 
