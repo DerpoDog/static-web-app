@@ -10,6 +10,48 @@ async function callApi() {
     document.getElementById("output").textContent = text;
 }
 
+async function startup() {
+    const logoutBtn = document.getElementById("logoutBtn");
+    const callApiBtn = document.getElementById("callApiBtn");
+    const output = document.getElementById("output");
+
+    try {
+        await window.auth.initAuth();
+
+        if (!window.auth.isSignedIn()) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", async () => {
+                try {
+                    await window.auth.logout();
+                } catch (e) {
+                    output.textContent = "Logout failed: " + e.message;
+                }
+            });
+        }
+
+        if (callApiBtn) {
+            callApiBtn.addEventListener("click", async () => {
+                try {
+                    const token = await window.auth.getAccessToken();
+                    output.textContent = "Access token acquired:\n\n" + token;
+                } catch (e) {
+                    output.textContent = "API call failed: " + e.message;
+                }
+            });
+        }
+    } catch (e) {
+        if (output) {
+            output.textContent = "Startup failed: " + e.message;
+        }
+    }
+}
+
+startup();
+
 window.addEventListener("DOMContentLoaded", async () => {
     try {
         await window.auth.initAuth();

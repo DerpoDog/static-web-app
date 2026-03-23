@@ -12,15 +12,13 @@
             <div class="badge">Authentication</div>
 
             <h1>Welcome</h1>
-            <p class="subtitle">
-                Please sign in to continue.
-            </p>
+            <p class="subtitle">Please sign in to continue.</p>
 
             <div class="button-group">
-                <button id="loginBtn" class="btn btn-primary">
-                    Login / Sign up
-                </button>
+                <button id="loginBtn" class="btn btn-primary">Login / Sign up</button>
             </div>
+
+            <p id="errorText" class="subtitle" style="margin-top: 16px;"></p>
         </main>
     </div>
 
@@ -28,15 +26,31 @@
     <script src="/auth.js"></script>
 
     <script>
-        document.getElementById("loginBtn").addEventListener("click", async () => {
+        async function startup() {
+            const errorText = document.getElementById("errorText");
+            const loginBtn = document.getElementById("loginBtn");
+
             try {
-                await window.auth.login();
+                await window.auth.initAuth();
+
+                if (window.auth.isSignedIn()) {
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                loginBtn.addEventListener("click", async () => {
+                    try {
+                        await window.auth.login();
+                    } catch (e) {
+                        errorText.textContent = "Login failed: " + e.message;
+                    }
+                });
             } catch (e) {
-                document.getElementById("output").textContent = "Login failed: " + e;
+                errorText.textContent = "Startup failed: " + e.message;
             }
-        });
-        window.location.href = "index.html";
-    });
+        }
+
+        startup();
     </script>
 </body>
 </html>
