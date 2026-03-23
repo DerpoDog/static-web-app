@@ -3,7 +3,7 @@ const clientId = "bb2a932d-33f5-4ab4-bfc0-6f0fa041e83d";
 const apiClientId = "ad8b0367-13c2-49f2-8b43-a3bdd565efdf";
 const authorityHost = "testcustomers11.ciamlogin.com";
 
-const redirectUri = "https://white-grass-051116610.1.azurestaticapps.net/";
+const redirectUri = "https://white-grass-051116610.1.azurestaticapps.net/"
 
 const msalConfig = {
     auth: {
@@ -26,12 +26,7 @@ const tokenRequest = {
 async function initAuth() {
     await msalInstance.initialize();
 
-    const params = new URLSearchParams(window.location.search);
-
-    if (params.has("code")) {
-        sessionStorage.setItem("signedIn", "true");
-        history.replaceState({}, "", window.location.pathname);
-    }
+    await msalInstance.handleRedirectPromise();
 
     try {
         const response = await msalInstance.handleRedirectPromise();
@@ -55,22 +50,11 @@ function getAccount() {
 }
 
 function isSignedIn() {
-    return sessionStorage.getItem("signedIn") === "true";
+    return !!getAccount();
 }
 
-function login() {
-    const url =
-        `https://${authorityHost}/${tenantId}/oauth2/v2.0/authorize` +
-        `?client_id=${clientId}` +
-        `&nonce=j9wIZ8iyjn` +
-        `&redirect_uri=${encodeURIComponent(window.location.origin + "/")}` +
-        `&scope=openid` +
-        `&response_type=code` +
-        `&prompt=login` +
-        `&code_challenge_method=S256` +
-        `&code_challenge=9uEcpjMgkHKUCMrR7rBlJA0wdAg3CL_MnHlCuwkl0cM`;
-
-    window.location.href = url;
+async function login() {
+    await msalInstance.loginRedirect(tokenRequest);
 }
 
 async function logout() {
