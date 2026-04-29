@@ -24,6 +24,9 @@ async function startup() {
             return;
         }
 
+        const syncedUser = await syncCurrentUser();
+        output.textContent = "Logged in and synced:\n" + syncedUser;
+
         if (logoutBtn) {
             logoutBtn.addEventListener("click", async () => {
                 try {
@@ -101,4 +104,24 @@ function updateUI() {
     } else {
         document.getElementById("output").textContent = "Not signed in";
     }
+}
+
+async function syncCurrentUser() {
+    const token = await window.auth.getAccessToken();
+    const API_BASE = "https://questionapi-hpfnddgpgmabc2hx.belgiumcentral-01.azurewebsites.net";
+
+    const resp = await fetch(`${API_BASE}/api/users/me/sync`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+    const text = await resp.text();
+
+    if (!resp.ok) {
+        throw new Error(`User sync failed: ${resp.status} ${text}`);
+    }
+
+    return text;
 }
